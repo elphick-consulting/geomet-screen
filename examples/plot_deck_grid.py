@@ -14,6 +14,7 @@ and visualize it using Plotly.
 
 import numpy as np
 import pandas as pd
+import tempfile
 from pathlib import Path
 
 from geomet_screen.database import DatabaseConnection, ExcelLoader
@@ -33,8 +34,9 @@ deck_data = np.array([
 df = pd.DataFrame(deck_data)
 
 # Create a temporary Excel file
-example_dir = Path(__file__).parent
-workbook_path = example_dir / "example_screen.xlsx"
+with tempfile.NamedTemporaryFile(suffix='.xlsx', delete=False) as tmp:
+    workbook_path = tmp.name
+
 with pd.ExcelWriter(workbook_path, engine='openpyxl') as writer:
     df.to_excel(writer, sheet_name='Deck1', header=False, index=False)
 
@@ -50,7 +52,7 @@ db.create_tables()
 # Load the deck from Excel
 loader = ExcelLoader(db.get_session())
 deck = loader.load_deck_from_excel(
-    workbook_path=str(workbook_path),
+    workbook_path=workbook_path,
     sheet_name='Deck1',
     screen_name='Screen_A',
     deck_name='Deck_1',
@@ -86,5 +88,6 @@ fig.show()
 # Clean up
 
 db.close()
-if workbook_path.exists():
-    workbook_path.unlink()
+import os
+if os.path.exists(workbook_path):
+    os.unlink(workbook_path)
