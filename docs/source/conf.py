@@ -44,4 +44,5 @@ sphinx_gallery_conf = {
     'matplotlib_animations': False,
     'image_scrapers': ('matplotlib',),
     'default_thumb_file': None,
+    'capture_repr': ('_repr_html_',),  # Capture HTML representations (for plotly)
 }

@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:00.565** total execution time for 2 files **from all galleries**:
+**00:00.691** total execution time for 2 files **from all galleries**:
 
 .. container::
 
@@ -33,7 +33,7 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_auto_examples_plot_deck_grid.py` (``../../examples/plot_deck_grid.py``)
-     - 00:00.565
+     - 00:00.691
      - 0.0
    * - :ref:`sphx_glr_auto_examples_create_sample_data.py` (``../../examples/create_sample_data.py``)
      - 00:00.000

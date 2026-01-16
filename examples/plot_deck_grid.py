@@ -84,6 +84,20 @@ fig = plot_deck_grid(
 # Display the figure
 fig.show()
 
+# Save a static image for the gallery thumbnail
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Convert grid_df to matplotlib heatmap for thumbnail
+plt.figure(figsize=(8, 6))
+plt.imshow(grid_df.values, cmap='viridis', aspect='auto')
+plt.colorbar(label='Value')
+plt.title("Screen Deck A - Deck 1 Layout")
+plt.xlabel("Column")
+plt.ylabel("Row")
+plt.tight_layout()
+plt.show()
+
 # %%
 # Clean up
 
