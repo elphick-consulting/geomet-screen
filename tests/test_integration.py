@@ -5,7 +5,7 @@ from pathlib import Path
 import pandas as pd
 import numpy as np
 
-from geomet_screen import (
+from geomet.screen import (
     DatabaseConnection,
     ExcelLoader,
     plot_deck_grid,

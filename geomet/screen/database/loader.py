@@ -6,7 +6,7 @@ from typing import List, Optional
 import pandas as pd
 from sqlalchemy.orm import Session
 
-from geomet_screen.models import ScreenDeck, DeckGrid
+from geomet.screen.models import ScreenDeck, DeckGrid
 
 
 class ExcelLoader:

@@ -6,7 +6,7 @@ import numpy as np
 import tempfile
 from pathlib import Path
 
-from geomet_screen.visualization import plot_deck_grid, save_deck_plot
+from geomet.screen.visualization import plot_deck_grid, save_deck_plot
 
 
 @pytest.fixture

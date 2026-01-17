@@ -6,8 +6,8 @@ from pathlib import Path
 import pandas as pd
 import numpy as np
 
-from geomet_screen.database import DatabaseConnection, ExcelLoader
-from geomet_screen.models import ScreenDeck, DeckGrid
+from geomet.screen.database import DatabaseConnection, ExcelLoader
+from geomet.screen.models import ScreenDeck, DeckGrid
 
 
 @pytest.fixture

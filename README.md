@@ -31,7 +31,7 @@ pip install -e ".[dev,docs]"
 ### Load a Screen Deck from Excel
 
 ```python
-from geomet_screen import DatabaseConnection, ExcelLoader
+from geomet.screen import DatabaseConnection, ExcelLoader
 
 # Initialize database
 db = DatabaseConnection("screen_data.db")
@@ -50,7 +50,7 @@ deck = loader.load_deck_from_excel(
 ### Visualize the Deck
 
 ```python
-from geomet_screen import plot_deck_grid
+from geomet.screen import plot_deck_grid
 
 # Get deck data
 grid_df = loader.get_deck_data(deck.id)

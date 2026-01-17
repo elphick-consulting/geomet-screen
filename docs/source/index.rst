@@ -34,7 +34,7 @@ Load a screen deck from an Excel workbook:
 
 .. code-block:: python
 
-   from geomet_screen import DatabaseConnection, ExcelLoader
+   from geomet.screen import DatabaseConnection, ExcelLoader
 
    # Initialize database
    db = DatabaseConnection("screen_data.db")
@@ -53,7 +53,7 @@ Visualize the deck:
 
 .. code-block:: python
 
-   from geomet_screen import plot_deck_grid
+   from geomet.screen import plot_deck_grid
 
    # Get deck data
    grid_df = loader.get_deck_data(deck.id)

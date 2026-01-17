@@ -17,8 +17,8 @@ import pandas as pd
 import tempfile
 from pathlib import Path
 
-from geomet_screen.database import DatabaseConnection, ExcelLoader
-from geomet_screen.visualization import plot_deck_grid
+from geomet.screen.database import DatabaseConnection, ExcelLoader
+from geomet.screen.visualization import plot_deck_grid
 
 # %%
 # First, create a sample Excel workbook with deck data

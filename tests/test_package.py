@@ -1,6 +1,6 @@
 """Tests for the main package."""
 
-from geomet_screen import (
+from geomet.screen import (
     DatabaseConnection,
     ExcelLoader,
     ScreenDeck,

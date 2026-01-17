@@ -4,8 +4,8 @@ import pytest
 import tempfile
 from pathlib import Path
 
-from geomet_screen.database import DatabaseConnection
-from geomet_screen.models import ScreenDeck, DeckGrid
+from geomet.screen.database import DatabaseConnection
+from geomet.screen.models import ScreenDeck, DeckGrid
 
 
 def test_database_connection_memory():

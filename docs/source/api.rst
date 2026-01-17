@@ -4,17 +4,17 @@ API Reference
 Database
 --------
 
-.. automodule:: geomet_screen.database
+.. automodule:: geomet.screen.database
    :members:
    :undoc-members:
    :show-inheritance:
 
-.. automodule:: geomet_screen.database.connection
+.. automodule:: geomet.screen.database.connection
    :members:
    :undoc-members:
    :show-inheritance:
 
-.. automodule:: geomet_screen.database.loader
+.. automodule:: geomet.screen.database.loader
    :members:
    :undoc-members:
    :show-inheritance:
@@ -22,12 +22,12 @@ Database
 Models
 ------
 
-.. automodule:: geomet_screen.models
+.. automodule:: geomet.screen.models
    :members:
    :undoc-members:
    :show-inheritance:
 
-.. automodule:: geomet_screen.models.screen_deck
+.. automodule:: geomet.screen.models.screen_deck
    :members:
    :undoc-members:
    :show-inheritance:
@@ -35,7 +35,7 @@ Models
 Visualization
 -------------
 
-.. automodule:: geomet_screen.visualization
+.. automodule:: geomet.screen.visualization
    :members:
    :undoc-members:
    :show-inheritance:

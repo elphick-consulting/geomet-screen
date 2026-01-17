@@ -3,7 +3,7 @@
 from sqlalchemy import Column, Integer, String, Float, ForeignKey
 from sqlalchemy.orm import relationship
 
-from geomet_screen.database.connection import Base
+from geomet.screen.database.connection import Base
 
 
 class ScreenDeck(Base):

@@ -12,7 +12,7 @@ Basic Usage
 
 .. code-block:: python
 
-   from geomet_screen import DatabaseConnection, ExcelLoader
+   from geomet.screen import DatabaseConnection, ExcelLoader
 
    # Initialize database
    db = DatabaseConnection("screen_data.db")
@@ -58,7 +58,7 @@ Create plotly visualizations:
 
 .. code-block:: python
 
-   from geomet_screen import plot_deck_grid
+   from geomet.screen import plot_deck_grid
 
    fig = plot_deck_grid(
        grid_df,
@@ -71,7 +71,7 @@ Save to file:
 
 .. code-block:: python
 
-   from geomet_screen import save_deck_plot
+   from geomet.screen import save_deck_plot
 
    save_deck_plot(
        grid_df,
