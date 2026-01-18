@@ -7,21 +7,18 @@ and visualize it using Plotly.
 """
 
 # %%
-# Load and Visualize Screen Deck
-# -------------------------------
-# We'll load a deck from an Excel workbook, store it in the database,
-# and create a plotly visualization.
+# Create Sample Data
+# ------------------
+# First, we'll create a sample Excel workbook with deck data for demonstration.
 
 import numpy as np
 import pandas as pd
 import tempfile
-from pathlib import Path
+import os
+import matplotlib.pyplot as plt
 
 from geomet.screen.database import DatabaseConnection, ExcelLoader
 from geomet.screen.visualization import plot_deck_grid
-
-# %%
-# First, create a sample Excel workbook with deck data
 
 # Create sample data for demonstration (5x5 grid)
 deck_data = np.array([
@@ -40,10 +37,12 @@ with tempfile.NamedTemporaryFile(suffix='.xlsx', delete=False) as tmp:
 with pd.ExcelWriter(workbook_path, engine='openpyxl') as writer:
     df.to_excel(writer, sheet_name='Deck1', header=False, index=False)
 
-print(f"Created example workbook: {workbook_path}")
+print(f"Created example workbook with {df.shape[0]}x{df.shape[1]} grid")
 
 # %%
-# Set up the database and load the deck
+# Load Deck from Excel
+# --------------------
+# Initialize the database and load the deck layout from the Excel workbook.
 
 # Initialize database (in-memory for this example)
 db = DatabaseConnection()
@@ -58,50 +57,65 @@ deck = loader.load_deck_from_excel(
     deck_name='Deck_1',
 )
 
-print(f"Loaded deck: {deck}")
+print(f"Loaded deck: {deck.screen_name} / {deck.deck_name}")
 print(f"Number of grid cells: {len(deck.grid_cells)}")
 
 # %%
-# Extract and visualize the deck data
+# Query Deck Data
+# ---------------
+# Extract the deck data as a DataFrame for visualization.
 
 # Get the deck data as a DataFrame
 grid_df = loader.get_deck_data(deck.id)
 
-print("Grid data shape:", grid_df.shape)
-print("\nGrid data:\n", grid_df)
+print(f"Grid data shape: {grid_df.shape}")
+print("\nGrid data:")
+print(grid_df)
 
 # %%
-# Create the plotly visualization
+# Create Matplotlib Visualization
+# --------------------------------
+# Create a heatmap visualization using matplotlib for the gallery thumbnail.
 
-fig = plot_deck_grid(
+fig, ax = plt.subplots(figsize=(8, 6))
+im = ax.imshow(grid_df.values, cmap='viridis', aspect='auto')
+ax.set_xlabel('Column')
+ax.set_ylabel('Row')
+ax.set_title('Screen Deck A - Deck 1 Layout')
+cbar = plt.colorbar(im, ax=ax, label='Value')
+plt.tight_layout()
+plt.show()
+
+# %%
+# Create Plotly Visualization
+# ----------------------------
+# Create an interactive heatmap visualization with Plotly.
+
+fig_plotly = plot_deck_grid(
     grid_df,
-    title="Screen Deck A - Deck 1 Layout",
+    title="Screen Deck A - Deck 1 Layout (Interactive)",
     colorscale="Viridis",
     width=700,
     height=600,
 )
 
-# Display the figure
-fig.show()
-
-# Save a static image for the gallery thumbnail
-import matplotlib.pyplot as plt
-import numpy as np
-
-# Convert grid_df to matplotlib heatmap for thumbnail
-plt.figure(figsize=(8, 6))
-plt.imshow(grid_df.values, cmap='viridis', aspect='auto')
-plt.colorbar(label='Value')
-plt.title("Screen Deck A - Deck 1 Layout")
-plt.xlabel("Column")
-plt.ylabel("Row")
-plt.tight_layout()
-plt.show()
+# Display the interactive figure
+# This will show as interactive HTML in notebooks and documentation
+fig_plotly.show()
 
 # %%
-# Clean up
+# Export with Kaleido
+# -------------------
+# Save the plotly figure as a static image using kaleido.
+
+fig_plotly.write_image("deck_grid_static.png", width=800, height=600)
+print("Saved static image: deck_grid_static.png")
+
+# %%
+# Clean up temporary files
 
 db.close()
-import os
 if os.path.exists(workbook_path):
     os.unlink(workbook_path)
+if os.path.exists("deck_grid_static.png"):
+    os.unlink("deck_grid_static.png")

@@ -41,6 +41,7 @@ sphinx_gallery_conf = {
     'examples_dirs': '../../examples',   # path to example scripts
     'gallery_dirs': 'auto_examples',     # path to gallery generated output
     'filename_pattern': '/plot_',        # pattern to identify example files
+    'ignore_pattern': r'/__.*\.py$|/_.*\.py$',  # Ignore files starting with _ or __
     'matplotlib_animations': False,
     'image_scrapers': ('matplotlib',),
     'default_thumb_file': None,

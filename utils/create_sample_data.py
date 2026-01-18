@@ -1,4 +1,9 @@
-"""Script to create sample Excel workbook for testing."""
+"""
+Utility script to create sample Excel workbook for testing.
+
+This is a development utility and not included in the Sphinx gallery.
+To run: python _create_sample_data.py
+"""
 
 import pandas as pd
 import numpy as np
