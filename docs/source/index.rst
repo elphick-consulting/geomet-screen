@@ -9,6 +9,7 @@ Tools for screen deck layouts, wear monitoring and partition models.
 
    installation
    usage
+   yaml_spec
    auto_examples/index
    api
 

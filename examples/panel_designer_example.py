@@ -12,10 +12,9 @@ We start with a simple panel specification and progressively add functionality.
 
 # %%
 # Import required classes
-from pathlib import Path
 import matplotlib.pyplot as plt
 
-from geomet.screen.design.panel_designer import PanelSpec, PanelTileGenerator
+from geomet.screen.models.panel import PanelSpec, PanelTileGenerator
 
 # %%
 # Simple panel spec
