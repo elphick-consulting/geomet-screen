@@ -11,7 +11,7 @@ sys.path.insert(0, os.path.abspath('../..'))
 project = 'geomet-screen'
 copyright = '2026, Elphick Consulting'
 author = 'Elphick Consulting'
-release = '0.1.0'
+release = '0.1.1'
 
 # -- General configuration ---------------------------------------------------
 
@@ -40,7 +40,7 @@ html_theme_options = {
 sphinx_gallery_conf = {
     'examples_dirs': '../../examples',   # path to example scripts
     'gallery_dirs': 'auto_examples',     # path to gallery generated output
-    'filename_pattern': '/plot_',        # pattern to identify example files
+    'filename_pattern': r'.*',  # run all examples
     'ignore_pattern': r'/__.*\.py$|/_.*\.py$',  # Ignore files starting with _ or __
     'matplotlib_animations': False,
     'image_scrapers': ('matplotlib',),
