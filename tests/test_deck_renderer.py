@@ -33,8 +33,8 @@ def test_create_mosaic_valid(tmp_path):
 
     # Define panels
     panels = {
-        "P001": PanelSpec(panel_w_mm=300, panel_h_mm=300, image_path=p1_img),
-        "P002": PanelSpec(panel_w_mm=600, panel_h_mm=300, image_path=p2_img),
+        "P001": PanelSpec(panel_width=300, panel_height=300, image_path=p1_img),
+        "P002": PanelSpec(panel_width=600, panel_height=300, image_path=p2_img),
     }
 
     # Define deck
@@ -54,7 +54,7 @@ def test_create_mosaic_valid(tmp_path):
 def test_missing_panel_image(tmp_path):
     """Test that DeckRenderer raises FileNotFoundError for missing image."""
     panels = {
-        "P001": PanelSpec(panel_w_mm=300, panel_h_mm=300, image_path=tmp_path / "missing.png"),
+        "P001": PanelSpec(panel_width=300, panel_height=300, image_path=tmp_path / "missing.png"),
     }
     deck = DeckSpec(name="TD", rows=1, cols=1, layout=[["P001"]])
     output_path = tmp_path / "deck_mosaic.png"

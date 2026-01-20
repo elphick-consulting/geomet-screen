@@ -216,3 +216,4 @@ __marimo__/
 *.xlsx
 examples/*.xlsx
 examples/*.png
+/scripts/panel_icon_196x196.png

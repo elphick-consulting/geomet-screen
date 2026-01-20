@@ -21,12 +21,12 @@ from geomet.screen.models.panel import PanelSpec, PanelTileGenerator
 # -----------------
 
 spec = PanelSpec(
-    panel_w_mm=300,
-    panel_h_mm=300,
-    aperture_long_mm=65,
-    aperture_short_mm=35,
+    panel_width=300,
+    panel_height=300,
+    aperture_long=65,
+    aperture_short=35,
     orientation="with-flow",  # ore flows top-to-bottom
-    radius_mm=5,              # rounded corners
+    radius=5,              # rounded corners
     aperture_rgba=(0, 0, 0, 0)  # transparent apertures
 )
 print("PanelSpec created:", spec)
@@ -68,13 +68,13 @@ print(f" Open area (%): {open_area['open_area_percent']:.2f}%")
 # Let's create another panel design with different specifications.
 
 spec2 = PanelSpec(
-    panel_w_mm=600,
-    panel_h_mm=300,
-    aperture_long_mm=26,
-    aperture_short_mm=7.5,
+    panel_width=600,
+    panel_height=300,
+    aperture_long=26,
+    aperture_short=7.5,
     orientation="cross-flow",
-    min_ligament_mm=5.0,
-    radius_mm=3,
+    min_ligament=5.0,
+    radius=3,
     panel_color_rgba=(0, 102, 204, 255)
 )
 generator2 = PanelTileGenerator(spec2)
