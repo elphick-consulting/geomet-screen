@@ -1,0 +1,33 @@
+
+name: Publish to PyPI
+
+on:
+  workflow_dispatch:  # Manual trigger
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install uv
+        run: pip install uv
+
+      - name: Install build tools
+        run: |
+          uv pip install --system build twine
+
+      - name: Build package
+        run: |
+          uv run python -m build
+
+      - name: Publish to PyPI
+        run: |
+          uv run twine upload dist/* -u __token__ -p ${{ secrets.PYPI_API_TOKEN }}
