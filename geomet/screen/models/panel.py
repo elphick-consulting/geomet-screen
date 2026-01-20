@@ -13,32 +13,40 @@ class PanelSpec:
     """Specification for a screen panel.
 
     Attributes:
-        panel_w_mm (int): Panel width in millimeters.
-        panel_h_mm (int): Panel height in millimeters.
-        px_per_mm (int): Scale factor in pixels per millimeter.
-        aperture_long_mm (float): Aperture length in millimeters.
-        aperture_short_mm (float): Aperture width in millimeters.
-        min_border_mm (float): Minimum border in millimeters.
-        min_ligament_mm (float): Minimum ligament width in millimeters.
-        radius_mm (float): Corner radius in millimeters.
+        name (Optional[str]): Optional name for the panel.
+        panel_width (int): Panel width in millimeters.
+        panel_height (int): Panel height in millimeters.
+        aperture_long (float): Aperture length in millimeters.
+        aperture_short (float): Aperture width in millimeters.
         orientation (str): Orientation of apertures ("with-flow" or "cross-flow").
+        material (Optional[str]): Material name.
+        duro_hardness (Optional[float]): Duro hardness value.
+        min_border (float): Minimum border in millimeters.
+        min_ligament (float): Minimum ligament width in millimeters.
+        radius (float): Corner radius in millimeters.
+        px_per_mm (int): Scale factor in pixels per millimeter.
         panel_color_rgba (RGBA): RGBA color for the panel.
         aperture_rgba (RGBA): RGBA color for apertures (default transparent).
         aperture_color_map (Optional[Dict[Tuple[int, int], ColorLike]]): Optional color map for apertures.
+        image_filepath (Optional[Path]): Optional file path for saving or accessing the generated image
     """
 
-    panel_w_mm: int = 300
-    panel_h_mm: int = 300
-    px_per_mm: int = 3
-    aperture_long_mm: float = 65.0
-    aperture_short_mm: float = 35.0
-    min_border_mm: float = 10.0
-    min_ligament_mm: float = 16.0
-    radius_mm: float = 1.0
+    name: Optional[str] = None
+    panel_width: int = 300
+    panel_height: int = 300
+    aperture_long: float = 65.0
+    aperture_short: float = 35.0
     orientation: str = "with-flow"  # "with-flow" or "cross-flow"
+    material: Optional[str] = None
+    duro_hardness: Optional[float] = None
+    min_border: float = 10.0
+    min_ligament: float = 16.0
+    radius: float = 0.0
+    px_per_mm: int = 3
     panel_color_rgba: RGBA = (127, 127, 127, 255)
     aperture_rgba: RGBA = (0, 0, 0, 0)  # Default transparent
     aperture_color_map: Optional[Dict[Tuple[int, int], ColorLike]] = None
+    image_path: Optional[Path] = None
 
     def __post_init__(self):
         """Validate radius and orientation after initialization."""
@@ -47,10 +55,10 @@ class PanelSpec:
             raise ValueError("Orientation must be 'with-flow' or 'cross-flow'.")
 
         # Validate radius: cannot exceed half of the smallest aperture dimension
-        min_aperture_dim = min(self.aperture_long_mm, self.aperture_short_mm)
-        if self.radius_mm > (min_aperture_dim / 2):
+        min_aperture_dim = min(self.aperture_long, self.aperture_short)
+        if self.radius > (min_aperture_dim / 2):
             raise ValueError(
-                f"Radius {self.radius_mm} mm is too large. "
+                f"Radius {self.radius} mm is too large. "
                 f"Must be <= {min_aperture_dim / 2:.2f} mm."
             )
 
@@ -61,13 +69,13 @@ class PanelSpec:
             Dict[str, int]: Dictionary of scaled dimensions in pixels.
         """
         return dict(
-            panel_w_px=int(round(self.panel_w_mm * self.px_per_mm)),
-            panel_h_px=int(round(self.panel_h_mm * self.px_per_mm)),
-            ap_long_px=int(round(self.aperture_long_mm * self.px_per_mm)),
-            ap_short_px=int(round(self.aperture_short_mm * self.px_per_mm)),
-            min_border_px=int(round(self.min_border_mm * self.px_per_mm)),
-            min_lig_px=int(round(self.min_ligament_mm * self.px_per_mm)),
-            radius_px=int(round(self.radius_mm * self.px_per_mm)),
+            panel_w_px=int(round(self.panel_width * self.px_per_mm)),
+            panel_h_px=int(round(self.panel_height * self.px_per_mm)),
+            ap_long_px=int(round(self.aperture_long * self.px_per_mm)),
+            ap_short_px=int(round(self.aperture_short * self.px_per_mm)),
+            min_border_px=int(round(self.min_border * self.px_per_mm)),
+            min_lig_px=int(round(self.min_ligament * self.px_per_mm)),
+            radius_px=int(round(self.radius * self.px_per_mm)),
         )
 
 
@@ -123,9 +131,9 @@ class PanelTileGenerator:
         """Compute total open area and percentage."""
         grid = self.compute_grid()
         cols, rows = grid["cols"], grid["rows"]
-        ap_w_mm = self.spec.aperture_short_mm if self.spec.orientation == "with-flow" else self.spec.aperture_long_mm
-        ap_h_mm = self.spec.aperture_long_mm if self.spec.orientation == "with-flow" else self.spec.aperture_short_mm
-        r_mm = self.spec.radius_mm
+        ap_w_mm = self.spec.aperture_short if self.spec.orientation == "with-flow" else self.spec.aperture_long
+        ap_h_mm = self.spec.aperture_long if self.spec.orientation == "with-flow" else self.spec.aperture_short
+        r_mm = self.spec.radius
 
         # Aperture area with rounded corners
         rect_area = ap_w_mm * ap_h_mm
@@ -133,7 +141,7 @@ class PanelTileGenerator:
         aperture_area = rect_area - corner_cutout
 
         total_open_area = aperture_area * cols * rows
-        panel_area = self.spec.panel_w_mm * self.spec.panel_h_mm
+        panel_area = self.spec.panel_width * self.spec.panel_height
         open_percent = (total_open_area / panel_area) * 100
 
         return {
@@ -147,7 +155,7 @@ class PanelTileGenerator:
     def generate_image(self, output_dir: Path) -> Path:
         """Generate the panel image and save it."""
         img = self._create_image()
-        filename = f"panel_{self.spec.panel_w_mm}x{self.spec.panel_h_mm}_{self.spec.aperture_long_mm}x{self.spec.aperture_short_mm}_{self.spec.orientation}.png"
+        filename = f"panel_{self.spec.panel_width}x{self.spec.panel_height}_{self.spec.aperture_long}x{self.spec.aperture_short}_{self.spec.orientation}.png"
         output_path = output_dir / filename
         img.save(output_path)
         return output_path
