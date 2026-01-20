@@ -20,6 +20,9 @@ jobs:
       - name: Install uv
         run: pip install uv
 
+      - name: Install publishing dependencies
+        run: pip install twine
+
       - name:  Sync dependencies from lock file
         run: |
           uv sync
