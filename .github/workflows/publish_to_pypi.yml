@@ -27,7 +27,7 @@ jobs:
 
       # ✅ Sync dependencies from uv.lock for reproducible build
       - name: Sync dependencies
-        run: uv sync --frozen --system
+        run: uv sync --frozen
 
       # ✅ Build the package using uv
       - name: Build package
