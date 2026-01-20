@@ -217,3 +217,4 @@ __marimo__/
 examples/*.xlsx
 examples/*.png
 /scripts/panel_icon_196x196.png
+/docs/source/sg_execution_times.rst
