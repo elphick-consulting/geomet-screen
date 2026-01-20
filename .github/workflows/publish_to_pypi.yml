@@ -3,14 +3,14 @@ name: Publish to PyPI
 
 on:
   release:
-    types: [published]  # Auto-trigger when a GitHub Release is published
-  workflow_dispatch:     # ✅ Allows manual trigger from GitHub Actions UI
+    types: [published]
+  workflow_dispatch:
 
 jobs:
   publish:
     runs-on: ubuntu-latest
     permissions:
-      id-token: write    # Required for OIDC Trusted Publisher
+      id-token: write
       contents: read
 
     steps:
@@ -25,15 +25,19 @@ jobs:
       - name: Install uv
         run: pip install uv
 
-      # ✅ Sync dependencies from uv.lock for reproducible build
+      # ✅ Sync dependencies from uv.lock
       - name: Sync dependencies
         run: uv sync --frozen
 
-      # ✅ Build the package using uv
+      # ✅ Install packaging tools
+      - name: Install build tools
+        run: uv pip install build twine
+
+      # ✅ Build the package
       - name: Build package
         run: uv run python -m build
 
-      # ✅ Publish to PyPI using Trusted Publisher (OIDC)
+      # ✅ Publish to PyPI using Trusted Publisher
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
