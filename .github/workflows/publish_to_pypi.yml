@@ -2,11 +2,16 @@
 name: Publish to PyPI
 
 on:
-  workflow_dispatch:  # Manual trigger
+  release:
+    types: [published]  # Auto-trigger when a GitHub Release is published
+  workflow_dispatch:     # ✅ Allows manual trigger from GitHub Actions UI
 
 jobs:
-  build-and-publish:
+  publish:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write    # Required for OIDC Trusted Publisher
+      contents: read
 
     steps:
       - name: Checkout code
@@ -20,17 +25,16 @@ jobs:
       - name: Install uv
         run: pip install uv
 
-      - name: Install publishing dependencies
-        run: pip install twine
+      # ✅ Sync dependencies from uv.lock for reproducible build
+      - name: Sync dependencies
+        run: uv sync --frozen --system
 
-      - name:  Sync dependencies from lock file
-        run: |
-          uv sync
-
+      # ✅ Build the package using uv
       - name: Build package
-        run: |
-          uv build
+        run: uv run python -m build
 
+      # ✅ Publish to PyPI using Trusted Publisher (OIDC)
       - name: Publish to PyPI
-        run: |
-          uv run twine upload dist/* -u __token__ -p ${{ secrets.PYPI_API_TOKEN }}
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          skip-existing: true
