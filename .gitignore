@@ -71,8 +71,8 @@ instance/
 # Sphinx documentation
 docs/_build/
 docs/build/
-docs/source/auto_examples/
-docs/source/_static/
+docs/auto_examples/
+docs/_static/
 docs/source/_templates/
 
 # PyBuilder
@@ -217,4 +217,4 @@ __marimo__/
 examples/*.xlsx
 examples/*.png
 /scripts/panel_icon_196x196.png
-/docs/source/sg_execution_times.rst
+/docs/sg_execution_times.rst

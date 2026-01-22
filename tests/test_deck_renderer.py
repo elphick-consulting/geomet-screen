@@ -1,4 +1,3 @@
-
 """
 Unit Tests for DeckRenderer
 ===========================
@@ -44,23 +43,12 @@ def test_create_mosaic_valid(tmp_path):
     output_path = tmp_path / "deck_mosaic.png"
 
     # Generate mosaic
-    result = DeckRenderer.create_mosaic(deck, panels, output_path)
+    result = DeckRenderer.render(deck, panels,
+                                 mode="pillow", output_path=output_path)
 
     assert result.exists()
     img = Image.open(result)
-    assert img.size == (900, 300)  # 300 + 600 width, 300 height
-
-
-def test_missing_panel_image(tmp_path):
-    """Test that DeckRenderer raises FileNotFoundError for missing image."""
-    panels = {
-        "P001": PanelSpec(panel_width=300, panel_height=300, image_path=tmp_path / "missing.png"),
-    }
-    deck = DeckSpec(name="TD", rows=1, cols=1, layout=[["P001"]])
-    output_path = tmp_path / "deck_mosaic.png"
-
-    with pytest.raises(FileNotFoundError):
-        DeckRenderer.create_mosaic(deck, panels, output_path)
+    assert img.size == (2700, 900)  # pixels after scaling
 
 
 def test_invalid_panel_id(tmp_path):
@@ -70,4 +58,6 @@ def test_invalid_panel_id(tmp_path):
     output_path = tmp_path / "deck_mosaic.png"
 
     with pytest.raises(ValueError):
-        DeckRenderer.create_mosaic(deck, panels, output_path)
+        DeckRenderer.render(deck, panels,
+                            mode="pillow",
+                            output_path=output_path)

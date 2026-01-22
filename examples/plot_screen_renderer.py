@@ -10,15 +10,23 @@ This example demonstrates how to:
 
 """
 
+# sphinx_gallery_thumbnail_number = -1
+
 # %%
 # Imports
 # -------
 from pathlib import Path
+
+import numpy as np
+import plotly
 import yaml
 from geomet.screen.models.screen import ScreenSpec
 from geomet.screen.models.deck import DeckSpec
 from geomet.screen.models.panel import PanelSpec
+from geomet.screen.render.deck_renderer import DeckRenderer
+from geomet.screen.render.panel_renderer import PanelRenderer
 from geomet.screen.render.screen_renderer import ScreenRenderer
+from geomet.screen.utils.mpl_tools import pil_to_figure
 
 # %%
 # Load Configuration
@@ -45,11 +53,27 @@ for panel_id, panel_data in config["panels"].items():
         panel_height=panel_data["height"],
         aperture_short=panel_data["aperture_short"],
         aperture_long=panel_data["aperture_long"],
+        radius=panel_data["radius"],
+        min_border=panel_data["min_border"],
         orientation=panel_data["orientation"],
         material=panel_data["material"],
         duro_hardness=panel_data["duro_hardness"],
-        image_path=None  # Assume images are optional for this example
     )
+
+# %%
+# Display panel images
+# --------------------
+
+img0 = PanelRenderer.get_or_create_image(panels["P000"])
+pil_to_figure(img0, figsize=(8, 4), title="Panel P000 Layout Visualization")
+
+# %%
+img1 = PanelRenderer.get_or_create_image(panels["P001"])
+pil_to_figure(img1, figsize=(8, 4), title="Panel P001 Layout Visualization")
+
+# %%
+img2 = PanelRenderer.get_or_create_image(panels["P002"])
+pil_to_figure(img2, figsize=(8, 4), title="Panel P002 Layout Visualization")
 
 # %%
 # Parse Screen and Decks
@@ -82,9 +106,24 @@ ScreenRenderer.render(screen, panels, mode="pillow", output_path=output_path, la
 print(f"Static image saved to: {output_path}")
 
 # %%
+# Display the generated image
+
+from PIL import Image
+
+img = Image.open(output_path)
+pil_to_figure(img, figsize=(8, 12), title="Screen Layout Visualization")
+
+# %%
 # Render with Plotly
 # -------------------
 # Generate an interactive visualization of the screen.
+#
+# We could render a single deck like this:
+# fig = DeckRenderer.render(decks["TD"], panels, mode="plotly")
+
+output_path = Path("assets/output/screen_layout.html")
 
 fig = ScreenRenderer.render(screen, panels, mode="plotly")
-fig.show()
+fig.write_html(output_path)
+
+plotly.io.show(fig)

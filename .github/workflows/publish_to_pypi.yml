@@ -2,11 +2,16 @@
 name: Publish to PyPI
 
 on:
-  workflow_dispatch:  # Manual trigger
+  release:
+    types: [published]
+  workflow_dispatch:
 
 jobs:
-  build-and-publish:
+  publish:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
 
     steps:
       - name: Checkout code
@@ -20,14 +25,20 @@ jobs:
       - name: Install uv
         run: pip install uv
 
-      - name:  Sync dependencies from lock file
-        run: |
-          uv sync
+      # ✅ Sync dependencies from uv.lock
+      - name: Sync dependencies
+        run: uv sync --frozen
 
+      # ✅ Install packaging tools
+      - name: Install build tools
+        run: uv pip install build twine
+
+      # ✅ Build the package
       - name: Build package
-        run: |
-          uv build
+        run: uv run python -m build
 
+      # ✅ Publish to PyPI using Trusted Publisher
       - name: Publish to PyPI
-        run: |
-          uv run twine upload dist/* -u __token__ -p ${{ secrets.PYPI_API_TOKEN }}
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          skip-existing: true

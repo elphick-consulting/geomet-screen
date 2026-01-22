@@ -1,6 +1,13 @@
 # geomet-screen
 
+[![PyPI version](https://img.shields.io/pypi/v/geomet-screen.svg)](https://pypi.org/project/geomet-screen/)
+[![Python versions](https://img.shields.io/pypi/pyversions/geomet-screen.svg)](https://pypi.org/project/geomet-screen/)
+[![Build status](https://github.com/elphick-consulting/geomet-screen/actions/workflows/tests.yml/badge.svg)](https://github.com/elphick-consulting/geomet-screen/actions)
+[![Documentation status](https://github.com/elphick-consulting/geomet-screen/actions/workflows/docs.yml/badge.svg)](https://github.com/elphick-consulting/geomet-screen/actions/workflows/docs.yml)
+[![License](https://img.shields.io/github/license/elphick-consulting/geomet-screen.svg)](https://github.com/elphick-consulting/geomet-screen/blob/main/LICENSE)
+
 Tools for screen deck layouts, wear monitoring and partition models.
+
 
 ## Features
 
