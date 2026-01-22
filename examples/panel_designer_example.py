@@ -14,7 +14,9 @@ We start with a simple panel specification and progressively add functionality.
 # Import required classes
 import matplotlib.pyplot as plt
 
-from geomet.screen.models.panel import PanelSpec, PanelTileGenerator
+from geomet.screen import PanelLayoutCalculator
+from geomet.screen.models.panel import PanelSpec
+from geomet.screen.render.panel_renderer import PanelRenderer
 
 # %%
 # Simple panel spec
@@ -32,18 +34,10 @@ spec = PanelSpec(
 print("PanelSpec created:", spec)
 
 # %%
-# Compute grid layout
-# -------------------
-
-generator = PanelTileGenerator(spec)
-grid = generator.compute_grid()
-print("Computed grid layout:", grid)
-
-# %%
 # Display the image
 # -----------------
 
-img = generator.show()  # Opens in default image viewer
+img = PanelRenderer.render_pillow(spec)
 
 plt.figure(figsize=(6, 6))
 plt.imshow(img)
@@ -55,7 +49,7 @@ plt.show()
 # Compute open area
 # -----------------
 
-open_area = generator.compute_open_area()
+open_area = PanelLayoutCalculator.compute_open_area(spec)
 print("Open area calculation:")
 print(f" Aperture area (mm²): {open_area['aperture_area_mm2']:.2f}")
 print(f" Total open area (mm²): {open_area['total_open_area_mm2']:.2f}")
@@ -73,13 +67,12 @@ spec2 = PanelSpec(
     aperture_long=26,
     aperture_short=7.5,
     orientation="cross-flow",
-    min_ligament=5.0,
+    min_ligament=6.0,
     radius=3,
     panel_color_rgba=(0, 102, 204, 255)
 )
-generator2 = PanelTileGenerator(spec2)
-grid2 = generator2.compute_grid()
-img2 = generator2.show()  # Opens in default image viewer
+
+img2 = PanelRenderer.render_pillow(spec2)
 plt.figure(figsize=(8, 4))
 plt.imshow(img2)
 plt.axis("off")

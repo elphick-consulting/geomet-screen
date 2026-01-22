@@ -1,6 +1,6 @@
 [project]
 name = "geomet-screen"
-version = "0.1.0"
+version = "0.1.1"
 description = "Tools for screen deck layouts, wear monitoring and partition models"
 readme = "README.md"
 authors = [

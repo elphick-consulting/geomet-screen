@@ -1,14 +1,13 @@
+
 """Tests for the main package."""
 
 from geomet.screen import (
-    DatabaseConnection,
-    ExcelLoader,
-    ScreenDeck,
-    DeckGrid,
     plot_deck_grid,
     save_deck_plot,
     __version__,
 )
+from geomet.screen.database import DatabaseConnection
+from geomet.screen.database.loader import ExcelLoader
 
 
 def test_version():
@@ -20,7 +19,5 @@ def test_imports():
     """Test that all main components can be imported."""
     assert DatabaseConnection is not None
     assert ExcelLoader is not None
-    assert ScreenDeck is not None
-    assert DeckGrid is not None
     assert plot_deck_grid is not None
     assert save_deck_plot is not None
