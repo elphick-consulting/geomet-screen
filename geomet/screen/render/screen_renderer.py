@@ -105,6 +105,7 @@ class ScreenRenderer:
         Returns:
             go.Figure: Plotly figure object with multiple deck heatmaps.
         """
+        from geomet.screen.render.panel_colors import PanelColorMapper
 
         deck_items = list(screen.decks.items())
         n_decks = len(deck_items)
@@ -118,93 +119,160 @@ class ScreenRenderer:
             subplot_titles=[deck_name for deck_name, _ in deck_items],
         )
 
-        # Move subplot titles a bit higher to avoid overlap with top tick labels
+        # Move subplot titles a bit higher
         if fig.layout.annotations:
             for ann in fig.layout.annotations:
                 ann.update(y=ann.y + 0.03, yanchor="bottom")
 
+        # 1\) Map panel id \-> panel type label (PanelSpec.name)
+        panel_type_by_id: Dict[str, str] = {}
+        for pid, pspec in panels.items():
+            panel_type_by_id[pid] = pspec.name
+
+        # 2\) Determine unique type labels actually used in the decks
+        type_labels = set()
+        for _, deck in deck_items:
+            for row in deck.layout:
+                for pid in row:
+                    if pid in panel_type_by_id:
+                        type_labels.add(panel_type_by_id[pid])
+
+        # 3\) Build a unique PanelSpec per type label, for color mapping
+        unique_specs: Dict[str, PanelSpec] = {}
+        for pid, pspec in panels.items():
+            tlabel = pspec.name
+            if tlabel in type_labels and tlabel not in unique_specs:
+                unique_specs[tlabel] = pspec
+
+        # 4\) Use PanelColorMapper to assign a color per panel type (by open area)
+        if unique_specs:
+            mapper = PanelColorMapper.from_specs(unique_specs)
+            type_color_map = mapper.generate_colormap()  # {type_label: hex}
+        else:
+            type_color_map = {}
+
+        # Fallback: if mapper did not return a color for some label, use grey
+        color_by_type: Dict[str, str] = {
+            tlabel: type_color_map.get(tlabel, "#808080") for tlabel in type_labels
+        }
+
+        shown_labels = set()
+
+        # 5\) For each deck and each type, add a masked heatmap trace
+        deck_axis_configs = []
         for col_idx, (deck_name, deck) in enumerate(deck_items, start=1):
-            deck_fig = DeckRenderer.render_plotly(deck, panels)
-            if not deck_fig.data:
-                continue
+            layout = deck.layout
+            rows = len(layout)
+            cols = len(layout[0]) if rows > 0 else 0
+            deck_axis_configs.append((rows, cols))
 
-            deck_trace = deck_fig.data[0]
+            # Precompute type grid
+            type_grid: List[List[str]] = [
+                [panel_type_by_id.get(pid, None) for pid in row] for row in layout
+            ]
 
-            # Place trace into correct subplot
-            fig.add_trace(
-                deck_trace,
-                row=1,
-                col=col_idx,
-            )
+            # For each type, build a mask: 1 where that type is present, None elsewhere
+            for tlabel in sorted(type_labels):
+                z_mask: List[List[float]] = []
+                any_found = False
+                for r in range(rows):
+                    row_vals: List[float] = []
+                    for c in range(cols):
+                        if type_grid[r][c] == tlabel:
+                            row_vals.append(1.0)
+                            any_found = True
+                        else:
+                            row_vals.append(None)
+                    z_mask.append(row_vals)
 
-            # First, add one trace per deck
-            deck_axis_configs = []
-            for col_idx, (deck_name, deck) in enumerate(deck_items, start=1):
-                deck_fig = DeckRenderer.render_plotly(deck, panels)
-                if not deck_fig.data:
+                if not any_found:
+                    # Skip types not present in this deck
                     continue
 
-                deck_trace = deck_fig.data[0]
-                fig.add_trace(deck_trace, row=1, col=col_idx)
+                color = color_by_type.get(tlabel, "#808080")
 
-                # Capture rows/cols used by this deck to derive tick ranges
-                # (same logic as in DeckRenderer)
-                layout = deck.layout
-                rows = len(layout)
-                cols = len(layout[0]) if rows > 0 else 0
-                deck_axis_configs.append((rows, cols))
-
-            # Now configure axes for each subplot so they match DeckRenderer
-            for col_idx, (rows, cols) in enumerate(deck_axis_configs, start=1):
-                # x ticks: A, B, C, ...
-                x_tickvals = list(range(cols))
-                x_ticktext = [chr(ord("A") + i) for i in range(cols)]
-
-                # y ticks: 1..rows, reversed axis
-                y_tickvals = list(range(rows))
-                y_ticktext = [str(i + 1) for i in y_tickvals]
-
-                fig.update_xaxes(
+                fig.add_trace(
+                    go.Heatmap(
+                        z=z_mask,
+                        x=list(range(cols)),
+                        y=list(range(rows)),
+                        colorscale=[[0.0, color], [1.0, color]],
+                        showscale=False,  # no colorbar, legend only
+                        name=tlabel,
+                        hovertemplate=(
+                                f"Deck: {deck_name}<br>"
+                                "Col: %{x}<br>"
+                                "Row: %{y}<extra>" + tlabel + "</extra>"
+                        ),
+                        legendgroup=tlabel,
+                        showlegend=tlabel not in shown_labels,
+                    ),
                     row=1,
                     col=col_idx,
-                    side="top",
-                    dtick=1,
-                    tickmode="array",
-                    tickvals=x_tickvals,
-                    ticktext=x_ticktext,
-                    showgrid=True,
-                    gridcolor="rgba(0,0,0,0.5)",
-                    zeroline=False,
-                    constrain="domain",
-                    scaleanchor=f"y{col_idx}" if col_idx > 1 else "y",
-                    scaleratio=1,
-                    range=[-0.5, cols - 0.5],
-                    tickfont=dict(color="rgba(0, 0, 0, 0.8)"),
                 )
 
-                fig.update_yaxes(
-                    row=1,
-                    col=col_idx,
-                    autorange="reversed",
-                    dtick=1,
-                    tickmode="array",
-                    tickvals=y_tickvals,
-                    ticktext=y_ticktext,
-                    showgrid=True,
-                    gridcolor="rgba(0,0,0,0.5)",
-                    zeroline=False,
-                    constrain="domain",
-                    range=[-0.5, rows - 0.5],
-                    tickfont=dict(color="rgba(0, 0, 0, 0.8)"),
-                )
+                shown_labels.add(tlabel)
 
-            fig.update_layout(
-                title_text=f"Screen Layout: {screen.name}",
-                showlegend=False,
+        # 6\) Configure axes so each subplot behaves like DeckRenderer
+        for col_idx, (rows, cols) in enumerate(deck_axis_configs, start=1):
+            x_tickvals = list(range(cols))
+            x_ticktext = [chr(ord("A") + i) for i in range(cols)]
+            y_tickvals = list(range(rows))
+            y_ticktext = [str(i + 1) for i in y_tickvals]
+
+            fig.update_xaxes(
+                row=1,
+                col=col_idx,
+                side="top",
+                dtick=1,
+                tickmode="array",
+                tickvals=x_tickvals,
+                ticktext=x_ticktext,
+                showgrid=True,
+                gridcolor="rgba(0,0,0,0.5)",
+                zeroline=False,
+                constrain="domain",
+                scaleanchor=f"y{col_idx}" if col_idx > 1 else "y",
+                scaleratio=1,
+                range=[-0.5, cols - 0.5],
+                tickfont=dict(color="rgba(0, 0, 0, 0.8)"),
             )
-            fig.update_coloraxes(showscale=False)
 
-            return fig
+            fig.update_yaxes(
+                row=1,
+                col=col_idx,
+                autorange="reversed",
+                dtick=1,
+                tickmode="array",
+                tickvals=y_tickvals,
+                ticktext=y_ticktext,
+                showgrid=True,
+                gridcolor="rgba(0,0,0,0.5)",
+                zeroline=False,
+                constrain="domain",
+                range=[-0.5, rows - 0.5],
+                tickfont=dict(color="rgba(0, 0, 0, 0.8)"),
+            )
+
+        # 7\) Layout: discrete legend on RHS, vertical stack
+        fig.update_layout(
+            title_text=f"Screen Layout: {screen.name}",
+            showlegend=True,
+            legend=dict(
+                x=1.02,
+                y=1.0,
+                xanchor="left",
+                yanchor="top",
+                orientation="v",
+                traceorder="normal",
+            ),
+            margin=dict(r=120),  # extra room for RHS legend
+        )
+
+        # No global colorbar
+        fig.update_coloraxes(showscale=False)
+
+        return fig
 
     @staticmethod
     def render(screen: ScreenSpec, panels: Dict[str, PanelSpec], mode: Literal["pillow", "plotly"], output_path: Path = None, layout: str = "horizontal"):
